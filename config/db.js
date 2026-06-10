@@ -1,11 +1,13 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`✅ MongoDB холбогдлоо: ${conn.connection.host}`);
+    const uri = process.env.MONGO_URI
+    console.log('MONGO_URI:', uri ? 'байна ✅' : 'байхгүй ❌')
+    const conn = await mongoose.connect(uri)
+    console.log(`✅ MongoDB холбогдлоо: ${conn.connection.host}`)
   } catch (error) {
-    console.error(`❌ MongoDB алдаа: ${error.message}`);
-    process.exit(1);
+    console.error(`❌ MongoDB алдаа: ${error.message}`)
+    process.exit(1)
   }
-};
-module.exports = connectDB;
+}
+module.exports = connectDB
