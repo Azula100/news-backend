@@ -10,6 +10,7 @@ const connectDB = require('./config/db')
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: './config/config.env' })
 }
+const connectDB = require('./config/db')
 connectDB()
 
 const app = express()
