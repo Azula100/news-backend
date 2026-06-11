@@ -15,8 +15,11 @@ const connectDB = require('./config/db')
 connectDB()
 
 const app = express()
-
+const dataDir = path.join(__dirname, 'data')
 const uploadDir = path.join(__dirname, 'data/uploads')
+if (fs.existsSync(dataDir) && !fs.statSync(dataDir).isDirectory()) {
+  fs.unlinkSync(dataDir)
+}
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true })
 
 app.use(cors({ origin: '*', credentials: true }))
