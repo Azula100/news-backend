@@ -1,6 +1,7 @@
 const News     = require('../models/News')
 const Category = require('../models/Category')
 const path = require('path')
+const cloudinary = require('../config/cloudinary')
 
 exports.getAllNews = async (req, res) => {
     try {
@@ -60,10 +61,11 @@ exports.createNews = async (req, res) => {
         let image = 'no-photo.jpg'
         if (req.files && req.files.image) {
             const file = req.files.image
-            const filename = Date.now() + path.extname(file.name)
-            const uploadPath = path.join(__dirname, '../data/uploads', filename)
-            await file.mv(uploadPath)          
-            image = `/uploads/${filename}`
+            const result = await cloudinary.uploader.upload(file.tempFilePath || file.data, {
+              folder: 'news',
+              resource_type: 'image'
+            })
+            image = result.secure_url
         }
         const news = await News.create({
             title, content, category, image,
@@ -97,12 +99,13 @@ exports.updateNews = async (req, res) => {
         }
         const updates = { ...req.body }
         if (req.files && req.files.image) {
-            const file = req.files.image
-            const filename = Date.now() + path.extname(file.name)
-            const uploadPath = path.join(__dirname, '../data/uploads', filename)
-            await file.mv(uploadPath)
-            updates.image = `/uploads/${filename}`
-        }
+        const file = req.files.image
+        const result = await cloudinary.uploader.upload(file.tempFilePath || file.data, {
+          folder: 'news',
+          resource_type: 'image'
+        })
+        updates.image = result.secure_url  
+}
         const updated = await News.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
             .populate('author',   'name email')
             .populate('category', 'name photo')
