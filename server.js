@@ -1,11 +1,11 @@
-const express      = require('express')
-const dotenv       = require('dotenv')
-const cors         = require('cors')
-const path         = require('path')
-const fs           = require('fs')
+const express = require('express')
+const dotenv = require('dotenv')
+const cors = require('cors')
+const path = require('path')
+const fs = require('fs')
 const cookieParser = require('cookie-parser')
-const morgan       = require('morgan')
-const fileupload   = require('express-fileupload')
+const morgan = require('morgan')
+const fileupload = require('express-fileupload')
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: './config/config.env' })
