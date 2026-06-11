@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.2.0",
+    "ckeditor5": "^44.0.0"
     "cloudinary": "^1.41.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
