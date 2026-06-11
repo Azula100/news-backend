@@ -25,7 +25,6 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 app.use(fileupload({limits: { fileSize: 50 * 1024 * 1024 },}))
 app.use(cookieParser())
 app.use(morgan('dev'))
-app.use(fileupload())
 app.use('/uploads', express.static(path.join(__dirname, 'data/uploads')))
 
 app.use('/api/auth',       require('./routes/userRoute'))
