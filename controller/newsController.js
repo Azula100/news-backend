@@ -78,32 +78,39 @@ exports.createNews = async (req, res) => {
     res.status(500).json({ success: false, message: err.message })
   }
 }
-
 exports.updateNews = async (req, res) => {
   try {
+    console.log('=== updateNews эхэллээ ===')
+    console.log('req.body:', req.body)
+    console.log('req.files:', req.files ? Object.keys(req.files) : 'байхгүй')
     const news = await News.findById(req.params.id)
     if (!news) return res.status(404).json({ success: false, message: 'Мэдээ олдсонгүй' })
-
     if (news.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Хандах эрх байхгүй' })
     }
-
     const updates = { ...req.body }
-
+    console.log('updates:', updates)
     if (req.files && req.files.image) {
-      updates.image = await uploadToCloudinary(req.files.image, 'news')
+      console.log('Зураг upload эхэллээ...')
+      try {
+        updates.image = await uploadToCloudinary(req.files.image, 'news')
+        console.log('✅ Зураг URL:', updates.image)
+      } catch (cloudErr) {
+        console.log('❌ Cloudinary алдаа:', cloudErr.message)
+        return res.status(500).json({ success: false, message: 'Зураг: ' + cloudErr.message })
+      }
     }
-
     const updated = await News.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
       .populate('author',   'name email')
       .populate('category', 'name photo')
-
+    console.log('✅ Амжилттай хадгалагдлаа')
     res.json({ success: true, data: updated })
   } catch (err) {
+    console.log('❌ updateNews алдаа:', err.message)
+    console.log('Stack:', err.stack)
     res.status(500).json({ success: false, message: err.message })
   }
 }
-
 exports.deleteNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id)
