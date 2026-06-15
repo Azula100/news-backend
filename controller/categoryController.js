@@ -1,6 +1,7 @@
 const NewsCategory = require('../models/Category')
 const News  = require('../models/News')
 const path = require('path')
+const cloudinary = require('../config/cloudinary')
 
 exports.getAllCategories = async (req, res, next) => {
     try {
@@ -27,55 +28,40 @@ exports.getCategoryById = async (req, res, next) => {
     }
 }
 
-exports.createCategory = async (req, res, next) => {
-    try {
-        const existing = await NewsCategory.findOne({ name: req.body.name?.trim() })
-        if (existing) {
-            return res.status(400).json({ success: false, message: 'Энэ нэртэй категори аль хэдийн байна' })
-        }
-
-        let photo = 'no-photo.jpg'
-        if (req.files && req.files.photo) {
-            const file = req.files.photo
-            const filename = 'cat-' + Date.now() + path.extname(file.name)
-            const uploadPath = path.join(__dirname, '../data/uploads', filename)
-            await file.mv(uploadPath)
-            photo = `/uploads/${filename}`
-        }
-
-        const category = await NewsCategory.create(req.body)
-        res.status(201).json({ success: true, data: category })
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(e => e.message)
-            return res.status(400).json({ success: false, message: messages.join(', ') })
-        }
-        res.status(400).json({ success: false, error: err.message })
+exports.createCategory = async (req, res) => {
+  try {
+    let photo = 'no-photo.jpg'
+    if (req.files && req.files.photo) {
+      const file = req.files.photo
+      const result = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.data.toString('base64')}`,
+        { folder: 'categories' }
+      )
+      photo = result.secure_url
     }
+    const category = await NewsCategory.create({ ...req.body, photo })
+    res.status(201).json({ success: true, data: category })
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message })
+  }
 }
 
-exports.updateCategory = async (req, res, next) => {
-    try {
-        const updates = { ...req.body }
-        if (req.files && req.files.photo) {
-            const file = req.files.photo
-            const filename = 'cat-' + Date.now() + path.extname(file.name)
-            const uploadPath = path.join(__dirname, '../data/uploads', filename)
-            await file.mv(uploadPath)
-            updates.photo = `/uploads/${filename}`
-        }
-        const category = await NewsCategory.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            { new: true, runValidators: true }
-        )
-        if (!category) {
-            return res.status(404).json({ success: false, message: 'Категори олдсонгүй' })
-        }
-        res.status(200).json({ success: true, data: category })
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message })
+exports.updateCategory = async (req, res) => {
+  try {
+    const updates = { ...req.body }
+    if (req.files && req.files.photo) {
+      const file = req.files.photo
+      const result = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.data.toString('base64')}`,
+        { folder: 'categories' }
+      )
+      updates.photo = result.secure_url
     }
+    const category = await NewsCategory.findByIdAndUpdate(req.params.id, updates, { new: true })
+    res.status(200).json({ success: true, data: category })
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message })
+  }
 }
 
 exports.deleteCategory = async (req, res, next) => {
