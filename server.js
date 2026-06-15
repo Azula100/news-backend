@@ -17,7 +17,7 @@ const app = express()
 app.use(cors({ origin: '*', credentials: true }))
 app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
-app.use(fileupload({ useTempFiles: false, limits: { fileSize: 10 * 1024 * 1024 } }))
+app.use(fileupload({useTempFiles: true, tempFileDir: '/tmp/', limits: { fileSize: 10 * 1024 * 1024 }}))
 app.use(cookieParser())
 app.use(morgan('dev'))
 
