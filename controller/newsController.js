@@ -2,11 +2,12 @@ const News      = require('../models/News')
 const Category  = require('../models/Category')
 const cloudinary = require('../config/cloudinary')
 
-// Cloudinary-д зураг upload хийх helper
 const uploadToCloudinary = async (file, folder) => {
-  const b64    = file.data.toString('base64')
-  const dataUri = `data:${file.mimetype};base64,${b64}`
-  const result  = await cloudinary.uploader.upload(dataUri, { folder })
+  const source = file.tempFilePath || (() => {
+    const b64 = file.data.toString('base64')
+    return `data:${file.mimetype};base64,${b64}`
+  })()
+  const result = await cloudinary.uploader.upload(source, { folder })
   return result.secure_url
 }
 
