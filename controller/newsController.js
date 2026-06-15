@@ -90,29 +90,44 @@ exports.createNews = async (req, res) => {
 
 exports.updateNews = async (req, res) => {
     try {
+        console.log('req.files:', req.files)        // ← файл ирж байна уу
+        console.log('req.body:', req.body)          // ← body ирж байна уу
+
         const news = await News.findById(req.params.id)
         if (!news) return res.status(404).json({ success: false, message: 'Мэдээ олдсонгүй' })
+
         if (news.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Хандах эрх байхгүй' })
         }
+
         const updates = { ...req.body }
+
         if (req.files && req.files.image) {
             const file = req.files.image
-            const filename = Date.now() + path.extname(file.name)
-            const uploadPath = path.join(__dirname, '../data/uploads', filename)
-            await file.mv(uploadPath)
-            updates.image = `/uploads/${filename}`
+            console.log('File:', file.name, file.mimetype, file.size)
+
+            try {
+                const b64 = file.data.toString('base64')
+                const dataUri = `data:${file.mimetype};base64,${b64}`
+                const result = await cloudinary.uploader.upload(dataUri, { folder: 'news' })
+                updates.image = result.secure_url
+                console.log('✅ Cloudinary URL:', result.secure_url)
+            } catch (cloudErr) {
+                console.log('❌ Cloudinary алдаа:', cloudErr.message)
+                return res.status(500).json({ success: false, message: cloudErr.message })
+            }
         }
+
         const updated = await News.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
-            .populate('author',   'name email')
+            .populate('author', 'name email')
             .populate('category', 'name photo')
 
         res.json({ success: true, data: updated })
     } catch (err) {
+        console.log('❌ updateNews алдаа:', err.message)
         res.status(500).json({ success: false, message: err.message })
     }
 }
-
 exports.deleteNews = async (req, res) => {
     try {
         const news = await News.findById(req.params.id)
