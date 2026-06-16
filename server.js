@@ -16,8 +16,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 app.use(cookieParser())
 app.use(morgan('dev'))
 
-app.use('/api/auth',       require('./routes/userRoute'))
-app.use('/api/news',       require('./routes/newsRoute'))
+app.use('/api/auth', require('./routes/userRoute'))
+app.use('/api/news',  require('./routes/newsRoute'))
 app.use('/api/categories', require('./routes/categoryRoute'))
 
 app.get('/', (req, res) => res.json({ message: '📰 News API ажиллаж байна!' }))
