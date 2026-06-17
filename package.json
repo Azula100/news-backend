@@ -6,25 +6,18 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@ckeditor/ckeditor5-react": "^11.2.0",
-    "ckeditor5": "^44.0.0",
-    "cloudinary": "^1.41.0",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^1.41.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
-    "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.4.1",
     "morgan": "^1.10.1",
-    "multer": "^2.1.1",
     "nodemon": "^3.1.14"
   }
 }
